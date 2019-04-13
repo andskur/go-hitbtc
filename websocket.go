@@ -621,14 +621,11 @@ type OrderResponse struct {
 func (c *WSClient) PlaceOrder(id, symbol, side string, price, quantity float64) (*OrderResponse, error) {
 	var response OrderResponse
 	var request = PlaceOrderRequest{
-		Symbol:   symbol,
-		Side:     side,
-		Price:    price,
-		Quantity: quantity,
-	}
-
-	if id != "" {
-		request.ClientOrderId = id
+		ClientOrderId: id,
+		Symbol:        symbol,
+		Side:          side,
+		Price:         price,
+		Quantity:      quantity,
 	}
 
 	err := c.conn.Call(context.Background(), "newOrder", request, &response)
