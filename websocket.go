@@ -563,9 +563,74 @@ func (c *WSClient) GetTradingBalances() (*WsTradingBalancesResponse, error) {
 
 	err := c.conn.Call(context.Background(), "getTradingBalance", nil, &balances)
 	if err != nil {
-		return nil, errors.Annotate(err, "Hitbtc Auth Session")
+		return nil, errors.Annotate(err, "Hitbtc Get Trading Balances")
 	}
 
 	response.Balances = balances
+	return &response, nil
+}
+
+// PlaceOrderRequest is request for PlaceOrder method
+type PlaceOrderRequest struct {
+	ClientOrderId string  `json:"clientOrderId"`
+	Symbol        string  `json:"symbol"`
+	Side          string  `json:"side"`
+	Price         float64 `json:"price"`
+	Quantity      float64 `json:"quantity"`
+}
+
+// OrderResponse is response of PlaceOrder method
+type OrderResponse struct {
+	Id            int       `json:"id"`
+	ClientOrderId string    `json:"clientOrderId"`
+	Symbol        string    `json:"symbol"`
+	Side          string    `json:"side"`
+	Status        string    `json:"status"`
+	Type          string    `json:"type"`
+	TimeInForce   string    `json:"timeInForce"`
+	CumQuantity   float64   `json:"cumQuantity,string"`
+	PostOnly      bool      `json:"postOnly"`
+	Created       time.Time `json:"createdAt"`
+	Updated       time.Time `json:"updatedAt"`
+	ReportType    string    `json:"reportType"`
+}
+
+// PlaceOrderr place new buy or sell order with given params
+func (c *WSClient) PlaceOrder(id, symbol, side string, price, quantity float64) (*OrderResponse, error) {
+	var response OrderResponse
+	var request = PlaceOrderRequest{
+		Symbol:   symbol,
+		Side:     side,
+		Price:    price,
+		Quantity: quantity,
+	}
+
+	if id != "" {
+		request.ClientOrderId = id
+	}
+
+	err := c.conn.Call(context.Background(), "newOrder", request, &response)
+	if err != nil {
+		return nil, errors.Annotate(err, "Hitbtc Place Order")
+	}
+
+	return &response, nil
+}
+
+// CancelOrderRequest is request for CancelOrder method
+type CancelOrderRequest struct {
+	ClientOrderId string `json:"clientOrderId"`
+}
+
+// CancelOrder cancel order by given id
+func (c *WSClient) CancelOrder(id string) (*OrderResponse, error) {
+	var request = CancelOrderRequest{id}
+	var response OrderResponse
+
+	err := c.conn.Call(context.Background(), "cancelOrder", request, &response)
+	if err != nil {
+		return nil, errors.Annotate(err, "Hitbtc Cancel Order")
+	}
+
 	return &response, nil
 }
