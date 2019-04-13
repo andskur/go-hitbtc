@@ -656,7 +656,7 @@ func (c *WSClient) CancelOrder(id string) (*OrderResponse, error) {
 
 // WSOrderReport is response for order report
 type WSOrderReport struct {
-	Id            int       `json:"id"`
+	Id            string    `json:"id"`
 	ClientOrderId string    `json:"clientOrderId"`
 	Symbol        string    `json:"symbol"`
 	Side          string    `json:"side"`
