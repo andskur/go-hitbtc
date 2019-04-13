@@ -3,6 +3,7 @@ package hitbtc
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -624,8 +625,8 @@ func (c *WSClient) PlaceOrder(id, symbol, side string, price, quantity float64) 
 		ClientOrderId: id,
 		Symbol:        symbol,
 		Side:          side,
-		Price:         price,
-		Quantity:      quantity,
+		Price:         fmt.Sprintf("%.8f", price),
+		Quantity:      fmt.Sprintf("%.8f", quantity),
 	}
 
 	err := c.conn.Call(context.Background(), "newOrder", request, &response)
