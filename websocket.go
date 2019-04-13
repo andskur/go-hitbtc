@@ -611,7 +611,7 @@ type OrderResponse struct {
 	TimeInForce   string    `json:"timeInForce"`
 	Price         string    `json:"price"`
 	Quantity      string    `json:"quantity"`
-	CumQuantity   string    `json:"cumQuantity,string"`
+	CumQuantity   string    `json:"cumQuantity"`
 	PostOnly      bool      `json:"postOnly"`
 	Created       time.Time `json:"createdAt"`
 	Updated       time.Time `json:"updatedAt"`
@@ -666,7 +666,7 @@ type WSOrderReport struct {
 	TimeInForce   string    `json:"timeInForce"`
 	Price         string    `json:"price"`
 	Quantity      string    `json:"quantity"`
-	CumQuantity   string    `json:"cumQuantity,string"`
+	CumQuantity   string    `json:"cumQuantity"`
 	PostOnly      bool      `json:"postOnly"`
 	Created       time.Time `json:"createdAt"`
 	Updated       time.Time `json:"updatedAt"`
