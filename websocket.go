@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/juju/errors"
-	jsonrpc2 "github.com/sourcegraph/jsonrpc2"
+	"github.com/sourcegraph/jsonrpc2"
 	jsonrpc2ws "github.com/sourcegraph/jsonrpc2/websocket"
 )
 
@@ -523,4 +523,49 @@ func (c *WSClient) candlesSubscriptionOp(op string, symbol string, period string
 	}
 
 	return nil
+}
+
+// WsAuthRequest is request for authenticating trading websocket API
+type WsAuthRequest struct {
+	Algo string `json:"algo,required"`
+	PKey string `json:"pKey,required"`
+	SKey string `json:"sKey,required"`
+}
+
+// AuthSession authenticate client to make possible trading websocket requests
+func (c *WSClient) AuthSession(algo, pkey, skey string) (bool, error) {
+	var request = WsAuthRequest{algo, pkey, skey}
+	var response bool
+	err := c.conn.Call(context.Background(), "login", request, &response)
+	if err != nil {
+		return false, errors.Annotate(err, "Hitbtc Auth Session")
+	}
+
+	return response, nil
+}
+
+// WsTradingBalancesResponse is response structure for GetTradingBalances method
+type WsTradingBalancesResponse struct {
+	Balances []CurrencyBalance
+}
+
+// CurrencyBalance is currency balance structure in response
+type CurrencyBalance struct {
+	Currency  string `json:"currency"`
+	Available string `json:"available"`
+	Reserved  string `json:"reserved"`
+}
+
+// GetTradingBalances get available trading balances from websocket
+func (c *WSClient) GetTradingBalances() (*WsTradingBalancesResponse, error) {
+	var response WsTradingBalancesResponse
+	balances := make([]CurrencyBalance, 0)
+
+	err := c.conn.Call(context.Background(), "getTradingBalance", nil, &balances)
+	if err != nil {
+		return nil, errors.Annotate(err, "Hitbtc Auth Session")
+	}
+
+	response.Balances = balances
+	return &response, nil
 }

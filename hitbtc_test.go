@@ -3,7 +3,7 @@ package hitbtc_test
 import (
 	"testing"
 
-	hitbtc "github.com/bitbandi/go-hitbtc"
+	hitbtc "github.com/andskur/go-hitbtc"
 	"github.com/stretchr/testify/require"
 )
 

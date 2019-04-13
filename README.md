@@ -6,7 +6,7 @@ go-hitbtc is an implementation of the HitBTC API (public and private) in Golang.
 This version implement V2 HitBTC API.
 
 ## Import
-	import "github.com/bitbandi/go-hitbtc"
+	import "github.com/andskur/go-hitbtc"
 	
 ## Usage
 
@@ -17,7 +17,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/bitbandi/go-hitbtc"
+	"github.com/andskur/go-hitbtc"
 )
 
 const (
@@ -44,7 +44,7 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-	"github.com/bitbandi/go-hitbtc"
+	"github.com/andskur/go-hitbtc"
 )
 
 const (
