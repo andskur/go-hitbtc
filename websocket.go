@@ -592,25 +592,25 @@ func (c *WSClient) GetTradingBalances() (*WsTradingBalancesResponse, error) {
 
 // PlaceOrderRequest is request for PlaceOrder method
 type PlaceOrderRequest struct {
-	ClientOrderId string  `json:"clientOrderId"`
-	Symbol        string  `json:"symbol"`
-	Side          string  `json:"side"`
-	Price         float64 `json:"price"`
-	Quantity      float64 `json:"quantity"`
+	ClientOrderId string `json:"clientOrderId"`
+	Symbol        string `json:"symbol"`
+	Side          string `json:"side"`
+	Price         string `json:"price"`
+	Quantity      string `json:"quantity"`
 }
 
 // OrderResponse is response of PlaceOrder method
 type OrderResponse struct {
-	Id            int       `json:"id"`
+	Id            string    `json:"id"`
 	ClientOrderId string    `json:"clientOrderId"`
 	Symbol        string    `json:"symbol"`
 	Side          string    `json:"side"`
 	Status        string    `json:"status"`
 	Type          string    `json:"type"`
 	TimeInForce   string    `json:"timeInForce"`
-	Price         float64   `json:"price"`
-	Quantity      float64   `json:"quantity"`
-	CumQuantity   float64   `json:"cumQuantity,string"`
+	Price         string    `json:"price"`
+	Quantity      string    `json:"quantity"`
+	CumQuantity   string    `json:"cumQuantity,string"`
 	PostOnly      bool      `json:"postOnly"`
 	Created       time.Time `json:"createdAt"`
 	Updated       time.Time `json:"updatedAt"`
@@ -663,17 +663,17 @@ type WSOrderReport struct {
 	Status        string    `json:"status"`
 	Type          string    `json:"type"`
 	TimeInForce   string    `json:"timeInForce"`
-	Price         float64   `json:"price"`
-	Quantity      float64   `json:"quantity"`
-	CumQuantity   float64   `json:"cumQuantity,string"`
+	Price         string    `json:"price"`
+	Quantity      string    `json:"quantity"`
+	CumQuantity   string    `json:"cumQuantity,string"`
 	PostOnly      bool      `json:"postOnly"`
 	Created       time.Time `json:"createdAt"`
 	Updated       time.Time `json:"updatedAt"`
 	ReportType    string    `json:"reportType"`
-	TradeQuantity float64   `json:"tradeQuantity"`
-	TradePrice    float64   `json:"tradePrice"`
+	TradeQuantity string    `json:"tradeQuantity"`
+	TradePrice    string    `json:"tradePrice"`
 	TradeId       int       `json:"tradeId"`
-	TradeFee      float64   `json:"tradeFee"`
+	TradeFee      string    `json:"tradeFee"`
 }
 
 // WsTradeActiveOrders is response for Active orders
