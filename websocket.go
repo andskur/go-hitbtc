@@ -588,6 +588,8 @@ type OrderResponse struct {
 	Status        string    `json:"status"`
 	Type          string    `json:"type"`
 	TimeInForce   string    `json:"timeInForce"`
+	Price         float64   `json:"price"`
+	Quantity      float64   `json:"quantity"`
 	CumQuantity   float64   `json:"cumQuantity,string"`
 	PostOnly      bool      `json:"postOnly"`
 	Created       time.Time `json:"createdAt"`
