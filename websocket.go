@@ -21,6 +21,10 @@ type responseChannels struct {
 	TradesFeed    map[string]chan WSNotificationTradesSnapshot
 	CandlesFeed   map[string]chan WSNotificationCandlesSnapshot
 
+	// trading chan
+	ActiveOrders chan WsTradeActiveOrders
+	TradeReports chan WSOrderReport
+
 	ErrorFeed chan error
 }
 
@@ -92,6 +96,22 @@ func (h *responseChannels) Handle(ctx context.Context, conn *jsonrpc2.Conn, req 
 				h.ErrorFeed <- err
 			} else {
 				h.notifications.CandlesFeed[msg.Symbol] <- msg
+			}
+		case "activeOrders":
+			var msg WsTradeActiveOrders
+			err := json.Unmarshal(message, &msg)
+			if err != nil {
+				h.ErrorFeed <- err
+			} else {
+				h.ActiveOrders <- msg
+			}
+		case "report":
+			var msg WSOrderReport
+			err := json.Unmarshal(message, &msg)
+			if err != nil {
+				h.ErrorFeed <- err
+			} else {
+				h.TradeReports <- msg
 			}
 		}
 	}
@@ -375,15 +395,15 @@ type WSNotificationOrderbookSnapshot struct {
 	Ask      []WSSubtypeTrade `json:"ask,required"`
 	Bid      []WSSubtypeTrade `json:"bid,required"`
 	Symbol   string           `json:"symbol,required"`
-	Sequence int64            `json:"sequence,required"` // used to see if update is the latest received
+	Sequence int64            `json:"sequence,required"` // used to see if the snapshot is the latest received
 }
 
-// WSNotificationOrderbookUpdate is notification response type to orderbook snapshot on websocket
+// WSNotificationOrderbookUpdate is notification response type to orderbook update on websocket
 type WSNotificationOrderbookUpdate struct {
 	Ask      []WSSubtypeTrade `json:"ask,required"`
 	Bid      []WSSubtypeTrade `json:"bid,required"`
 	Symbol   string           `json:"symbol,required"`
-	Sequence int64            `json:"sequence,required"` // used to see if the snapshot is the latest
+	Sequence int64            `json:"sequence,required"` // used to see if update is the latest
 }
 
 // SubscribeOrderbook subscribes to the specified market order book notifications.
@@ -635,4 +655,56 @@ func (c *WSClient) CancelOrder(id string) (*OrderResponse, error) {
 	}
 
 	return &response, nil
+}
+
+// WSOrderReport is response for order report
+type WSOrderReport struct {
+	Id            int       `json:"id"`
+	ClientOrderId string    `json:"clientOrderId"`
+	Symbol        string    `json:"symbol"`
+	Side          string    `json:"side"`
+	Status        string    `json:"status"`
+	Type          string    `json:"type"`
+	TimeInForce   string    `json:"timeInForce"`
+	Price         float64   `json:"price"`
+	Quantity      float64   `json:"quantity"`
+	CumQuantity   float64   `json:"cumQuantity,string"`
+	PostOnly      bool      `json:"postOnly"`
+	Created       time.Time `json:"createdAt"`
+	Updated       time.Time `json:"updatedAt"`
+	ReportType    string    `json:"reportType"`
+	TradeQuantity float64   `json:"tradeQuantity"`
+	TradePrice    float64   `json:"tradePrice"`
+	TradeId       int       `json:"tradeId"`
+	TradeFee      float64   `json:"tradeFee"`
+}
+
+// WsTradeActiveOrders is response for Active orders
+type WsTradeActiveOrders struct {
+	Orders []Order
+}
+
+// SubscribeTradeReports subscribe to Trade Report channel
+func (c *WSClient) SubscribeTradeReports() (<-chan WsTradeActiveOrders, <-chan WSOrderReport, error) {
+	if c.conn == nil {
+		return nil, nil, errors.New("Connection is unitialized")
+	}
+
+	var success wsSubscriptionResponse
+	err := c.conn.Call(context.Background(), "subscribeReports", nil, &success)
+	if err != nil {
+		return nil, nil, errors.Annotate(err, "Hitbtc SubscribeTradeReports")
+	}
+	if !success {
+		return nil, nil, errors.New("Subscribe not successful")
+	}
+
+	if c.updates.ActiveOrders == nil {
+		c.updates.ActiveOrders = make(chan WsTradeActiveOrders)
+	}
+	if c.updates.TradeReports == nil {
+		c.updates.TradeReports = make(chan WSOrderReport)
+	}
+
+	return c.updates.ActiveOrders, c.updates.TradeReports, nil
 }
